@@ -1,5 +1,17 @@
 {
   "gate_A_world_written_operator": {
+    "analytic_spectral_susceptibility": [
+      -0.94736842,
+      -0.26315789,
+      -0.26315789,
+      -0.26315789,
+      -0.26315789,
+      0.94736842,
+      0.26315789,
+      0.26315789,
+      0.26315789,
+      0.26315789
+    ],
     "hub": {
       "future_B_mass": 0.65583613,
       "growth_ratio_B_over_A": 1.07228021
@@ -9,6 +21,7 @@
       "future_B_mass": 0.43463483,
       "growth_ratio_B_over_A": 0.97489705
     },
+    "max_abs_analytic_fd_error": 5.3e-07,
     "same_initial_state": true,
     "same_total_write": true,
     "spectral_susceptibility": [
@@ -39,8 +52,16 @@
     "weighted_median_angle_deg": 2.24643049
   },
   "gate_C_adaptive_boundary": {
+    "accumulating_naive_median_angle_deg": 17.4374429,
+    "accumulating_weighted_median_angle_deg": 7.49179878,
     "adaptive_naive_median_angle_deg": 17.4374429,
     "adaptive_weighted_median_angle_deg": 7.49179878,
+    "estimated_utility_beats_uniform_median": true,
+    "estimated_utility_median_angle_deg": 2.82507247,
+    "estimated_utility_seed_win_fraction": 0.5625,
+    "oracle_beats_uniform_median": true,
+    "oracle_median_angle_deg": 2.52362834,
+    "oracle_seed_win_fraction": 0.5625,
     "seeds": 64,
     "steps": 200,
     "uniform_median_angle_deg": 3.25260316,
