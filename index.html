@@ -3,119 +3,515 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SolSwarm — world-written operators</title>
+<title>SolSwarm Live</title>
 <style>
-:root{--bg:#0b0d10;--panel:#11161c;--ink:#e8edf2;--muted:#8793a0;--line:#27303a;--a:#5ab0ff;--b:#ff665e;--good:#58d68d;--warn:#ffd166}
-*{box-sizing:border-box} body{margin:0;background:radial-gradient(circle at 20% 0,#13202a 0,#0b0d10 38%);color:var(--ink);font:15px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace}
-main{max-width:1180px;margin:auto;padding:42px 22px 80px} h1{font-size:clamp(34px,6vw,72px);line-height:.95;margin:0 0 14px;letter-spacing:-.06em} h2{margin:0 0 8px;font-size:22px}
-.kicker{color:var(--good);letter-spacing:.12em;text-transform:uppercase;font-size:12px}.lede{max-width:850px;color:#bcc7d1;font-size:18px}.eq{padding:12px 16px;border:1px solid var(--line);background:#0e1217;border-radius:8px;color:#d7e0e8;overflow:auto}
-.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px;margin-top:26px}.card{grid-column:span 6;background:linear-gradient(180deg,#12181f,#0f1419);border:1px solid var(--line);border-radius:14px;padding:20px;box-shadow:0 18px 60px #0005}.wide{grid-column:1/-1}
-.metricrow{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}.metric{background:#0b1014;border:1px solid #222c35;border-radius:10px;padding:12px}.metric b{display:block;font-size:21px}.muted{color:var(--muted)}.good{color:var(--good)}.warn{color:var(--warn)}
-button,input{font:inherit} button{background:#17212a;color:var(--ink);border:1px solid #33414d;border-radius:7px;padding:8px 12px;cursor:pointer}button.active{border-color:var(--good);color:var(--good)}
-.controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:12px 0} canvas{width:100%;height:280px;background:#0a0e12;border:1px solid #202a33;border-radius:10px}
-.bar{height:10px;background:#1b242c;border-radius:999px;overflow:hidden;margin-top:5px}.bar i{display:block;height:100%}
-.small{font-size:12px}.claim{border-left:3px solid var(--good);padding-left:14px;margin:18px 0}
-@media(max-width:800px){.card{grid-column:1/-1}.metricrow{grid-template-columns:1fr}}
+:root{--bg:#0b0d10;--panel:#11161c;--ink:#e8edf2;--muted:#8793a0;--line:#27303a;
+--uni:#58d68d;--repo:#ffd166;--fix:#5ab0ff;--naive:#ffb347;--wt:#4fe3e3;--truth:#e8edf2}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 ui-monospace,SFMono-Regular,Consolas,monospace}
+main{max-width:1280px;margin:auto;padding:22px 16px 60px}
+h1{font-size:30px;margin:0 0 4px;letter-spacing:-.03em}
+h2{font-size:17px;margin:0 0 4px}
+.muted{color:var(--muted)} .small{font-size:12px}
+.bar{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin:12px 0 18px}
+button{font:inherit;background:#17212a;color:var(--ink);border:1px solid #33414d;border-radius:6px;padding:6px 11px;cursor:pointer}
+button.on{border-color:var(--uni);color:var(--uni)}
+label{display:inline-flex;gap:6px;align-items:center;color:#bcc7d1}
+input[type=range]{width:110px}
+select{font:inherit;background:#17212a;color:var(--ink);border:1px solid #33414d;border-radius:6px;padding:4px}
+section{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:16px}
+.row{display:grid;gap:10px;grid-template-columns:repeat(4,minmax(0,1fr));margin-top:10px}
+.row3{display:grid;gap:10px;grid-template-columns:repeat(3,minmax(0,1fr));margin-top:10px}
+.cell canvas{width:100%;aspect-ratio:4/3;display:block;background:#000;border-radius:8px;image-rendering:auto}
+.cap{margin-top:5px;font-size:12px;color:#bcc7d1;min-height:34px}
+.sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-2px;border:1px solid #444}
+.split{display:grid;gap:14px;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);margin-top:10px}
+#chart{width:100%;height:190px;background:#0a0e12;border:1px solid #202a33;border-radius:8px;display:block}
+#worldCv{width:100%;aspect-ratio:4/3;background:#000;border-radius:8px;cursor:crosshair;display:block}
+#liveB{cursor:crosshair}
+.k{font-weight:bold}
+.note{border-left:3px solid #33414d;padding-left:10px;margin-top:10px;color:#9aa6b2;font-size:12px}
+@media(max-width:820px){.row{grid-template-columns:repeat(2,minmax(0,1fr))}.row3,.split{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <main>
-<div class="kicker">SolSwarm / v0 falsifier</div>
-<h1>The world writes<br>the next operator.</h1>
-<p class="lede">A small experiment about stigmergy, positive operators, biased scouts, importance correction, and Oja. The page visualizes the geometry; the committed Python receipt is authoritative.</p>
-<div class="eq">q(t+1) = L(s) q(t) / 1ᵀL(s)q(t) &nbsp;&nbsp; · &nbsp;&nbsp; importance weight = p(x) / q(x)</div>
+<h1>SolSwarm Live</h1>
+<div class="muted">Your webcam is the world. Scouts decide where to look. An online Oja learner builds the frame's colour mean and main colour axis from what the scouts see.</div>
 
-<section class="grid">
-<article class="card">
-  <div class="kicker">Gate A</div><h2>Matched write, different address</h2>
-  <p class="muted">Same current population. Same amount of persistent trace. Only the address changes.</p>
-  <div class="controls">
-    <button id="hubBtn" class="active">write B hub</button><button id="leafBtn">write B leaf</button>
-    <label>write <input id="write" type="range" min="0" max=".3" value=".15" step=".005"></label>
-    <span id="writeVal">0.150</span>
-  </div>
-  <canvas id="modeCanvas" width="700" height="280"></canvas>
-  <div class="metricrow">
-    <div class="metric"><span class="muted">B/A spectral ratio</span><b id="ratio">1.072</b></div>
-    <div class="metric"><span class="muted">B mass now</span><b>0.500</b></div>
-    <div class="metric"><span class="muted">B mass at t=20</span><b id="future">0.656</b></div>
-  </div>
-  <p class="claim">The spectral ordering changes before the visible population has had time to separate.</p>
-</article>
+<div class="bar">
+  <button id="camBtn">Start camera</button>
+  <button id="synBtn">Synthetic scene</button>
+  <button id="resetBtn">Reset learners</button>
+  <label>looks/frame <input id="K" type="range" min="1" max="40" value="6"><span id="Kv">6</span></label>
+  <label>η <input id="eta" type="range" min="0.002" max="0.08" step="0.002" value="0.02"><span id="etav">0.020</span></label>
+  <label>exploration <input id="expl" type="range" min="0.02" max="1" step="0.02" value="0.2"><span id="explv">0.20</span></label>
+  <span id="status" class="muted small"></span>
+</div>
 
-<article class="card">
-  <div class="kicker">Gate B</div><h2>Importance-weighted Oja</h2>
-  <p class="muted">The scouts spend 83.2% of their looks on two misleading high-error sites. Naive Oja learns the visitation distribution. Reweighting learns the intended world distribution.</p>
-  <canvas id="ojaCanvas" width="700" height="280"></canvas>
-  <div class="metricrow">
-    <div class="metric"><span class="muted">naive angle</span><b class="warn">74.37°</b></div>
-    <div class="metric"><span class="muted">weighted angle</span><b class="good">2.25°</b></div>
-    <div class="metric"><span class="muted">high-error visit mass</span><b>83.2%</b></div>
+<section>
+  <h2>Gate B: the swarm's view of the world vs the world's own</h2>
+  <div class="muted small">The scouts are drawn to a lure (click the live view to move it). Both learners get the <i>same</i> looks. Naive Oja learns the colours of wherever the scouts gathered. Importance-weighted Oja (weight = p/q) learns the colours of the whole frame. Each panel after the first redraws the frame using only that learner's mean + main axis (a rank-1 colour image).</div>
+  <div class="bar" style="margin:8px 0 0">
+    <label>lure <select id="sal"><option value="lure">click lure</option><option value="bright">brightness</option><option value="motion">motion</option></select></label>
+    <label>pull β <input id="betaB" type="range" min="0" max="12" step="0.5" value="6"><span id="betaBv">6.0</span></label>
+    <span class="small muted">mass on lure region: <span id="lureMass" class="k">–</span></span>
   </div>
-</article>
-
-<article class="card wide">
-  <div class="kicker">Gate C / negative boundary</div><h2>Bias correction is not a free optimizer</h2>
-  <p>The closed-loop scouts leave trace where the raw Oja update is large, and that trace attracts later looks. Importance correction makes this adaptive stream much less biased, but at equal budget it still loses to uniform sampling.</p>
-  <div class="metricrow">
-    <div class="metric"><span class="muted">uniform</span><b class="good">3.25°</b><div class="bar"><i style="width:18%;background:var(--good)"></i></div></div>
-    <div class="metric"><span class="muted">adaptive + corrected</span><b>7.49°</b><div class="bar"><i style="width:42%;background:var(--a)"></i></div></div>
-    <div class="metric"><span class="muted">adaptive naive</span><b class="warn">17.44°</b><div class="bar"><i style="width:96%;background:var(--warn)"></i></div></div>
+  <div class="row">
+    <div class="cell"><canvas id="liveB" width="160" height="120"></canvas><div class="cap">live frame + biased scouts</div></div>
+    <div class="cell"><canvas id="naiveCv" width="160" height="120"></canvas><div class="cap" id="naiveCap"></div></div>
+    <div class="cell"><canvas id="wtCv" width="160" height="120"></canvas><div class="cap" id="wtCap"></div></div>
+    <div class="cell"><canvas id="truthCv" width="160" height="120"></canvas><div class="cap" id="truthCap"></div></div>
   </div>
-  <p class="claim">What survives: nonuniform looking can be statistically corrected. What does not survive: “follow useful-looking updates” automatically beats randomness.</p>
-</article>
 </section>
 
-<p class="muted small">Frozen receipt: 32 seeds × 3,000 observations for Gate B; 64 seeds × 200 observations for Gate C. See README and receipts/latest.json.</p>
-</main>
-<script>
-const hubBtn=document.getElementById('hubBtn'),leafBtn=document.getElementById('leafBtn'),slider=document.getElementById('write');
-let site='hub';
-function transition(){
-  const M=Array.from({length:10},()=>Array(10).fill(0));
-  [[0,5],[5,0]].forEach(([base,other])=>{
-    M[base][base]=.36; for(let l=base+1;l<base+5;l++) M[l][base]=.15; M[other][base]=.04;
-    for(let l=base+1;l<base+5;l++){M[base][l]=.54;M[l][l]=.42;M[other][l]=.04}
-  }); return M;
-}
-const M=transition();
-function matVec(A,x){return A.map(r=>r.reduce((s,v,j)=>s+v*x[j],0))}
-function rho5(block){
-  let v=Array(5).fill(.2);
-  for(let k=0;k<80;k++){let y=block.map(r=>r.reduce((s,a,j)=>s+a*v[j],0));let n=y.reduce((a,b)=>a+b,0);v=y.map(x=>x/n)}
-  let y=block.map(r=>r.reduce((s,a,j)=>s+a*v[j],0)); return y.reduce((a,b)=>a+b,0);
-}
-function makeL(write,site){
-  const trace=Array(10).fill(0); trace[site==='hub'?5:6]=write;
-  const fit=trace.map((s,i)=>Math.exp((i<5?.08:0)+2*s));
-  return M.map(r=>r.map((v,j)=>v*fit[j]));
-}
-function sub(A,a){return A.slice(a,a+5).map(r=>r.slice(a,a+5))}
-function evolve(L){
-  let q=Array(10).fill(.1),hist=[.5];
-  for(let t=0;t<20;t++){q=matVec(L,q);let z=q.reduce((a,b)=>a+b,0);q=q.map(x=>x/z);hist.push(q.slice(5).reduce((a,b)=>a+b,0))}
-  return hist;
-}
-function drawMode(){
-  const w=+slider.value, L=makeL(w,site), ratio=rho5(sub(L,5))/rho5(sub(L,0)), hist=evolve(L);
-  document.getElementById('writeVal').textContent=w.toFixed(3);document.getElementById('ratio').textContent=ratio.toFixed(3);document.getElementById('future').textContent=hist.at(-1).toFixed(3);
-  const c=document.getElementById('modeCanvas'),x=c.getContext('2d'),W=c.width,H=c.height;x.clearRect(0,0,W,H);
-  x.strokeStyle='#27303a';x.lineWidth=1;for(let k=0;k<=4;k++){let y=30+k*(H-60)/4;x.beginPath();x.moveTo(45,y);x.lineTo(W-20,y);x.stroke()}
-  x.strokeStyle=site==='hub'?'#58d68d':'#5ab0ff';x.lineWidth=3;x.beginPath();hist.forEach((v,i)=>{let px=45+i*(W-70)/20,py=H-30-(v-.35)/.35*(H-60);i?x.lineTo(px,py):x.moveTo(px,py)});x.stroke();
-  x.fillStyle='#8793a0';x.font='13px monospace';x.fillText('visible B population mass',45,18);x.fillText('t=0',45,H-8);x.fillText('t=20',W-58,H-8);
-  x.fillStyle=ratio>1?'#58d68d':'#ffd166';x.fillText(ratio>1?'spectral mode: B grows':'spectral mode: A grows',W-230,20);
-}
-hubBtn.onclick=()=>{site='hub';hubBtn.classList.add('active');leafBtn.classList.remove('active');drawMode()};leafBtn.onclick=()=>{site='leaf';leafBtn.classList.add('active');hubBtn.classList.remove('active');drawMode()};slider.oninput=drawMode;
+<section>
+  <h2>Gate C: three samplers, same number of looks</h2>
+  <div class="muted small">All three are importance-weighted, so all learn the world's axis. The difference is how fast they track it. <span style="color:var(--uni)">Uniform</span> looks everywhere equally. <span style="color:var(--repo)">Repo trace</span> is SolSwarm v0's rule: trace += update size on every visit, so visited places attract more visits. <span style="color:var(--fix)">Estimate trace</span> keeps a per-site running <i>estimate</i> of update size, so it looks where a look is expected to teach something. Colour shows each sampler's current proposal q. Press Reset to restart the race.</div>
+  <div class="row3">
+    <div class="cell"><canvas id="cU" width="160" height="120"></canvas><div class="cap" id="capU"></div></div>
+    <div class="cell"><canvas id="cR" width="160" height="120"></canvas><div class="cap" id="capR"></div></div>
+    <div class="cell"><canvas id="cF" width="160" height="120"></canvas><div class="cap" id="capF"></div></div>
+  </div>
+  <canvas id="chart" width="1200" height="190" style="margin-top:10px"></canvas>
+  <div class="cap" id="raceCap"></div>
+</section>
 
-function drawOja(){
-  const c=document.getElementById('ojaCanvas'),x=c.getContext('2d'),W=c.width,H=c.height;x.clearRect(0,0,W,H);const cx=W/2,cy=H/2,s=48;
-  x.strokeStyle='#27303a';x.beginPath();x.moveTo(20,cy);x.lineTo(W-20,cy);x.moveTo(cx,20);x.lineTo(cx,H-20);x.stroke();
-  const pts=[[2.2,.2],[-2.1,-.1],[1.8,-.3],[-1.9,.25],[2,.4],[-2.2,-.35],[.2,2.6],[-.15,-2.7]];
-  const probs=[.03,.03,.03,.03,.03,.03,.42,.42];pts.forEach((p,i)=>{x.beginPath();x.arc(cx+p[0]*s,cy-p[1]*s,5+probs[i]*20,0,Math.PI*2);x.fillStyle=i>=6?'#ff665e99':'#5ab0ff99';x.fill()});
-  function vec(angle,len,color,label){x.strokeStyle=color;x.lineWidth=4;x.beginPath();x.moveTo(cx,cy);x.lineTo(cx+Math.cos(angle)*len,cy-Math.sin(angle)*len);x.stroke();x.fillStyle=color;x.font='13px monospace';x.fillText(label,cx+Math.cos(angle)*len*.72+5,cy-Math.sin(angle)*len*.72)}
-  const target=Math.atan2(.192051,.981385);vec(target,125,'#58d68d','target world PC');vec(target+74.366*Math.PI/180,105,'#ffd166','naive');vec(target+2.246*Math.PI/180,115,'#5ab0ff','weighted');
+<section>
+  <h2>Gate A: where a write would change the future most</h2>
+  <div class="muted small">A population lives on a coarse grid: each generation every cell multiplies it by exp(α·s), then it diffuses. Raise α and the population concentrates. Here s is the estimate-trace sampler's usefulness map plus your own writes. Right eigenvector v = where the population settles (the sender). Left eigenvector u = how much each cell's contents matter for future growth (the listener). Their product u·v is the elasticity: exactly d log λ / d s<sub>i</sub> ÷ α. Click to write trace into a cell. The page checks the prediction α·e<sub>i</sub>·write against a full recomputation.</div>
+  <div class="split">
+    <canvas id="worldCv" width="320" height="240"></canvas>
+    <div>
+      <div class="bar" style="margin:0 0 8px">
+        <label>show <select id="view"><option value="e">u·v elasticity</option><option value="v">v (sender)</option><option value="u">u (listener)</option><option value="s">s (trace)</option></select></label>
+        <label>α <input id="alpha" type="range" min="0" max="4" step="0.1" value="1.5"><span id="alphav">3.00</span></label>
+        <label>write <input id="wamp" type="range" min="0.01" max="1" step="0.01" value="0.05"><span id="wampv">0.05</span></label>
+      </div>
+      <div class="cap">growth rate λ: <span id="lam" class="k">–</span></div>
+      <div class="cap" id="clickCap">Click a cell to write trace there.</div>
+      <div class="note">For small writes the prediction and the recomputation agree (first-order eigenvalue perturbation, the same formula as matrix-population elasticity analysis). For large writes they separate, because the response is nonlinear. Equal writes to different addresses have different effects. That is SolSwarm's hub-vs-leaf result, here on a live map.</div>
+    </div>
+  </div>
+</section>
+
+<div class="note">Claim boundary: nothing here is a new algorithm. Oja's rule, importance sampling, variance-aware proposals and Perron eigenvalue sensitivity are all established. The page makes the three SolSwarm gates visible on a real, changing world. Camera frames never leave the browser.</div>
+</main>
+
+<script id="core">
+// ---------- DOM-free core (tested headlessly) ----------
+const SS = (() => {
+  const SCALE = 4; // colour units ×4 so update sizes match the repo's feature scale
+
+  function features(rgba, W, H, cs, out, lum) {
+    const cw = (W / cs) | 0, ch = (H / cs) | 0, n = cs * cs * 255;
+    for (let cy = 0; cy < ch; cy++) for (let cx = 0; cx < cw; cx++) {
+      let r = 0, g = 0, b = 0;
+      for (let y = 0; y < cs; y++) {
+        let o = ((cy * cs + y) * W + cx * cs) * 4;
+        for (let x = 0; x < cs; x++, o += 4) { r += rgba[o]; g += rgba[o + 1]; b += rgba[o + 2]; }
+      }
+      const i = cy * cw + cx;
+      out[3 * i] = SCALE * r / n; out[3 * i + 1] = SCALE * g / n; out[3 * i + 2] = SCALE * b / n;
+      if (lum) lum[i] = (r + g + b) / (3 * n);
+    }
+  }
+
+  const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+  function normalize(v) { const n = Math.hypot(v[0], v[1], v[2]) || 1; v[0] /= n; v[1] /= n; v[2] /= n; return v; }
+  function angle(a, b) {
+    const c = Math.abs(dot(a, b)) / ((Math.hypot(...a) * Math.hypot(...b)) || 1);
+    return Math.acos(Math.min(1, c)) * 180 / Math.PI;
+  }
+
+  // Exact (uniform-p) mean and principal colour axis of the frame.
+  function truth(X, N, wPrev) {
+    const m = [0, 0, 0];
+    for (let i = 0; i < N; i++) { m[0] += X[3 * i]; m[1] += X[3 * i + 1]; m[2] += X[3 * i + 2]; }
+    m[0] /= N; m[1] /= N; m[2] /= N;
+    const C = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+    for (let i = 0; i < N; i++) {
+      const z0 = X[3 * i] - m[0], z1 = X[3 * i + 1] - m[1], z2 = X[3 * i + 2] - m[2];
+      C[0] += z0 * z0; C[1] += z0 * z1; C[2] += z0 * z2; C[4] += z1 * z1; C[5] += z1 * z2; C[8] += z2 * z2;
+    }
+    C[3] = C[1]; C[6] = C[2]; C[7] = C[5];
+    for (let k = 0; k < 9; k++) C[k] /= N;
+    let w = wPrev ? wPrev.slice() : [1, 0.9, 0.8];
+    for (let it = 0; it < 40; it++) {
+      w = normalize([C[0] * w[0] + C[1] * w[1] + C[2] * w[2], C[3] * w[0] + C[4] * w[1] + C[5] * w[2], C[6] * w[0] + C[7] * w[1] + C[8] * w[2]]);
+    }
+    if (w[0] + w[1] + w[2] < 0) { w[0] = -w[0]; w[1] = -w[1]; w[2] = -w[2]; }
+    return { m, w, C };
+  }
+
+  class Learner {
+    constructor() { this.reset(); }
+    reset() { this.m = [0.5 * SCALE, 0.5 * SCALE, 0.5 * SCALE]; this.w = normalize([1, -1, 0]); }
+    // One Oja look at site i with importance weight r. Returns the raw (unweighted) update size.
+    step(X, i, r, eta) {
+      const a = Math.min(eta * r, 0.5), m = this.m, w = this.w;
+      const x0 = X[3 * i], x1 = X[3 * i + 1], x2 = X[3 * i + 2];
+      m[0] += a * (x0 - m[0]); m[1] += a * (x1 - m[1]); m[2] += a * (x2 - m[2]);
+      const z0 = x0 - m[0], z1 = x1 - m[1], z2 = x2 - m[2];
+      const y = w[0] * z0 + w[1] * z1 + w[2] * z2;
+      const g0 = y * (z0 - y * w[0]), g1 = y * (z1 - y * w[1]), g2 = y * (z2 - y * w[2]);
+      w[0] += a * g0; w[1] += a * g1; w[2] += a * g2; normalize(w);
+      return Math.hypot(g0, g1, g2);
+    }
+  }
+
+  // q = (1-e)·softmax(β·vals) + e·uniform
+  function softmaxProposal(vals, beta, e, q) {
+    const N = vals.length; let mx = -Infinity;
+    for (let i = 0; i < N; i++) if (vals[i] > mx) mx = vals[i];
+    let s = 0;
+    for (let i = 0; i < N; i++) { q[i] = Math.exp(beta * (vals[i] - mx)); s += q[i]; }
+    for (let i = 0; i < N; i++) q[i] = (1 - e) * q[i] / s + e / N;
+    return q;
+  }
+  // q = (1-e)·vals/Σvals + e·uniform   (vals ≥ 0)
+  function linearProposal(vals, e, q) {
+    const N = vals.length; let s = 0;
+    for (let i = 0; i < N; i++) s += vals[i];
+    for (let i = 0; i < N; i++) q[i] = (1 - e) * (s > 0 ? vals[i] / s : 1 / N) + e / N;
+    return q;
+  }
+  function cdf(q, c) { let s = 0; for (let i = 0; i < q.length; i++) { s += q[i]; c[i] = s; } return c; }
+  function sample(c, u) {
+    const t = u * c[c.length - 1]; let lo = 0, hi = c.length - 1;
+    while (lo < hi) { const mid = (lo + hi) >> 1; if (c[mid] < t) lo = mid + 1; else hi = mid; }
+    return lo;
+  }
+
+  // ---- positive world operator L = D·diag(f), D = symmetric lazy diffusion on a cw×ch grid ----
+  function applyD(t, cw, ch, out) {
+    for (let y = 0; y < ch; y++) for (let x = 0; x < cw; x++) {
+      const i = y * cw + x; let acc = 0, deg = 0;
+      if (x > 0) { acc += t[i - 1]; deg++; }
+      if (x < cw - 1) { acc += t[i + 1]; deg++; }
+      if (y > 0) { acc += t[i - cw]; deg++; }
+      if (y < ch - 1) { acc += t[i + cw]; deg++; }
+      out[i] = t[i] * (1 - 0.125 * deg) + 0.125 * acc;
+    }
+    return out;
+  }
+  // Right Perron vector by warm-started power iteration. Returns λ.
+  // One generation = selection diag(f), then k diffusion sub-steps: L = D^k·diag(f).
+  function perron(f, cw, ch, v, iters, tmp, k = 1) {
+    const N = cw * ch; let lam = 1; const t2 = new Float64Array(N);
+    for (let it = 0; it < iters; it++) {
+      let s0 = 0; for (let i = 0; i < N; i++) { tmp[i] = f[i] * v[i]; s0 += v[i]; }
+      for (let r = 0; r < k - 1; r++) { applyD(tmp, cw, ch, t2); tmp.set(t2); }
+      applyD(tmp, cw, ch, v);
+      let s1 = 0; for (let i = 0; i < N; i++) s1 += v[i];
+      lam = s1 / s0;
+      for (let i = 0; i < N; i++) v[i] /= s1;
+    }
+    return lam;
+  }
+  // Left Perron vector by power iteration on Lᵀ = diag(f)·D^k (used in tests; D symmetric ⇒ u = f∘v).
+  function perronLeft(f, cw, ch, u, iters, tmp, k = 1) {
+    const N = cw * ch; const t2 = new Float64Array(N);
+    for (let it = 0; it < iters; it++) {
+      applyD(u, cw, ch, tmp);
+      for (let r = 0; r < k - 1; r++) { applyD(tmp, cw, ch, t2); tmp.set(t2); }
+      let s = 0; for (let i = 0; i < N; i++) { u[i] = f[i] * tmp[i]; s += u[i]; }
+      for (let i = 0; i < N; i++) u[i] /= s;
+    }
+  }
+  // elasticity e_i = u_i v_i / Σ u v  (= d log λ / d s_i ÷ α)
+  function elasticity(f, v, u, e) {
+    let s = 0; for (let i = 0; i < v.length; i++) { u[i] = f[i] * v[i]; e[i] = u[i] * v[i]; s += e[i]; }
+    for (let i = 0; i < v.length; i++) e[i] /= s;
+    return e;
+  }
+
+  return { SCALE, features, truth, Learner, angle, softmaxProposal, linearProposal, cdf, sample,
+           applyD, perron, perronLeft, elasticity };
+})();
+if (typeof module !== 'undefined') module.exports = SS;
+</script>
+
+<script>
+(() => {
+if (typeof document === 'undefined') return;
+const $ = id => document.getElementById(id);
+const W = 160, H = 120, CS = 4, CW = W / CS, CH = H / CS, N = CW * CH;     // 40×30 look grid
+const WW = 20, WH = 15, NW = WW * WH, KD = 8;                              // 20×15 world grid, 8 diffusion sub-steps per generation
+const S = SS.SCALE;
+
+const cap = document.createElement('canvas'); cap.width = W; cap.height = H;
+const cctx = cap.getContext('2d', { willReadFrequently: true });
+let video = null, source = null, rgba = null, frameNo = 0;
+
+const X = new Float32Array(3 * N), lum = new Float32Array(N), prevLum = new Float32Array(N), motion = new Float32Array(N);
+let tr = null;
+
+// Gate B
+const naive = new SS.Learner(), wtd = new SS.Learner();
+const qB = new Float64Array(N), cB = new Float64Array(N), sal = new Float64Array(N);
+let lure = { x: 0.5, y: 0.42 }, dotsB = [];
+
+// Gate C
+const mk = () => ({ L: new SS.Learner(), q: new Float64Array(N), c: new Float64Array(N), dots: [], hist: [] });
+const U = mk(), R = mk(), F = mk();
+R.trace = new Float64Array(N);
+F.est = new Float64Array(N).fill(0.3);
+
+// Gate A
+const s = new Float64Array(NW), userW = new Float64Array(NW), f = new Float64Array(NW);
+let v = new Float64Array(NW).fill(1 / NW);
+const u = new Float64Array(NW), el = new Float64Array(NW), tmpW = new Float64Array(NW);
+let lam = 1;
+
+const P = {};
+function bindRange(id, fmt) {
+  const el = $(id), out = $(id + 'v');
+  const upd = () => { P[id] = parseFloat(el.value); if (out) out.textContent = fmt(P[id]); };
+  el.addEventListener('input', upd); upd();
 }
-drawMode();drawOja();
+bindRange('K', x => x.toFixed(0)); bindRange('eta', x => x.toFixed(3)); bindRange('expl', x => x.toFixed(2));
+bindRange('betaB', x => x.toFixed(1)); bindRange('alpha', x => x.toFixed(2)); bindRange('wamp', x => x.toFixed(2));
+
+function resetLearners() {
+  naive.reset(); wtd.reset(); U.L.reset(); R.L.reset(); F.L.reset();
+  R.trace.fill(0); F.est.fill(0.3); U.hist = []; R.hist = []; F.hist = [];
+}
+$('resetBtn').onclick = resetLearners;
+
+// ---------- sources ----------
+$('camBtn').onclick = async () => {
+  try {
+    const st = await navigator.mediaDevices.getUserMedia({ video: { width: 320, height: 240 }, audio: false });
+    video = document.createElement('video'); video.srcObject = st; video.muted = true; video.playsInline = true;
+    await video.play(); source = 'cam';
+    $('camBtn').classList.add('on'); $('synBtn').classList.remove('on'); $('status').textContent = '';
+  } catch (e) {
+    startSyn(); $('status').textContent = 'Camera unavailable (' + e.name + '). If opened as a file, try: python -m http.server, then open http://localhost:8000/solswarm_live.html. Using the synthetic scene.';
+  }
+};
+function startSyn() { $('status').textContent = ''; source = 'syn'; $('synBtn').classList.add('on'); $('camBtn').classList.remove('on'); }
+$('synBtn').onclick = startSyn;
+
+function drawSynthetic(t) {
+  const g = cctx.createLinearGradient(0, 0, 0, H);
+  g.addColorStop(0, '#71849a'); g.addColorStop(0.62, '#4a5868'); g.addColorStop(0.63, '#5d4a39'); g.addColorStop(1, '#3d3026');
+  cctx.fillStyle = g; cctx.fillRect(0, 0, W, H);
+  cctx.fillStyle = '#e4ecf3'; cctx.fillRect(10, 10, 38, 30);                         // window
+  cctx.fillStyle = '#2c6e49'; cctx.fillRect(128, 44, 18, 30);                        // plant
+  const bx = 20 + 110 * (0.5 + 0.5 * Math.sin(t * 0.45));
+  cctx.fillStyle = '#c0392b'; cctx.fillRect(bx, 80, 16, 14);                         // red box
+  const fx = 80 + 14 * Math.sin(t * 0.7), fy = 50 + 6 * Math.sin(t * 1.1);
+  cctx.fillStyle = '#2b2119'; cctx.beginPath(); cctx.ellipse(fx, fy - 9, 17, 13, 0, 0, 7); cctx.fill();
+  cctx.fillStyle = '#d9a07f'; cctx.beginPath(); cctx.ellipse(fx, fy + 2, 14, 18, 0, 0, 7); cctx.fill();
+  cctx.fillStyle = '#6b4a3a'; cctx.fillRect(fx - 20, fy + 20, 40, 30);               // shirt
+}
+
+function grab() {
+  if (source === 'cam' && video && video.readyState >= 2) {
+    const vw = video.videoWidth, vh = video.videoHeight, sc = Math.max(W / vw, H / vh);
+    cctx.save(); cctx.translate(W, 0); cctx.scale(-1, 1); // mirror
+    cctx.drawImage(video, (W - vw * sc) / 2, (H - vh * sc) / 2, vw * sc, vh * sc); cctx.restore();
+  } else if (source === 'syn') drawSynthetic(performance.now() / 1000);
+  else return false;
+  rgba = cctx.getImageData(0, 0, W, H).data;
+  return true;
+}
+
+// ---------- per-frame science ----------
+function step() {
+  SS.features(rgba, W, H, CS, X, lum);
+  for (let i = 0; i < N; i++) { motion[i] = 0.75 * motion[i] + 0.25 * Math.abs(lum[i] - prevLum[i]); prevLum[i] = lum[i]; }
+  tr = SS.truth(X, N, tr && tr.w);
+  const K = P.K | 0, eta = P.eta, e = P.expl, p = 1 / N;
+
+  // Gate B: one biased stream, two learners
+  const mode = $('sal').value; let mx = 1e-9;
+  for (let i = 0; i < N; i++) {
+    let val;
+    if (mode === 'lure') { const dx = (i % CW) / CW - lure.x, dy = ((i / CW) | 0) / CH - lure.y; val = Math.exp(-(dx * dx + dy * dy) / (2 * 0.12 * 0.12)); }
+    else if (mode === 'bright') val = lum[i]; else val = motion[i];
+    sal[i] = val; if (val > mx) mx = val;
+  }
+  for (let i = 0; i < N; i++) sal[i] /= mx;
+  SS.softmaxProposal(sal, P.betaB, e, qB); SS.cdf(qB, cB);
+  let lm = 0; for (let i = 0; i < N; i++) if (sal[i] > 0.5) lm += qB[i];
+  $('lureMass').textContent = (100 * lm).toFixed(1) + '%';
+  dotsB = dotsB.slice(-6 * K);
+  for (let k = 0; k < K; k++) {
+    const i = SS.sample(cB, Math.random());
+    naive.step(X, i, 1, eta); wtd.step(X, i, p / qB[i], eta); dotsB.push(i);
+  }
+
+  // Gate C: three samplers, equal looks, all importance-weighted
+  SS.linearProposal(new Float64Array(N).fill(1), 0, U.q); SS.cdf(U.q, U.c);
+  SS.softmaxProposal(R.trace, 1.5, e, R.q); SS.cdf(R.q, R.c);
+  SS.linearProposal(F.est, e, F.q); SS.cdf(F.q, F.c);
+  for (const Z of [U, R, F]) {
+    Z.dots = Z.dots.slice(-6 * K);
+    for (let k = 0; k < K; k++) {
+      const i = SS.sample(Z.c, Math.random());
+      const g = Z.L.step(X, i, p / Z.q[i], eta);
+      Z.dots.push(i);
+      if (Z === R) { for (let j = 0; j < N; j++) R.trace[j] *= 0.97; R.trace[i] += g; }
+      if (Z === F) F.est[i] = 0.7 * F.est[i] + 0.3 * g;
+    }
+    Z.hist.push(SS.angle(Z.L.w, tr.w)); if (Z.hist.length > 600) Z.hist.shift();
+  }
+  // stale estimates drift back toward the mean so a changing world gets re-checked
+  let me = 0; for (let i = 0; i < N; i++) me += F.est[i]; me /= N;
+  for (let i = 0; i < N; i++) F.est[i] += 0.004 * (me - F.est[i]);
+
+  // Gate A: world trace = coarse usefulness map + user writes
+  worldTrace(s);
+  for (let i = 0; i < NW; i++) f[i] = Math.exp(P.alpha * s[i]);
+  lam = SS.perron(f, WW, WH, v, 60, tmpW, KD);
+  SS.elasticity(f, v, u, el);
+  for (let i = 0; i < NW; i++) userW[i] *= 0.997;
+}
+
+function worldTrace(out) {
+  let mx = 1e-9; const tmp = new Float64Array(NW);
+  for (let y = 0; y < WH; y++) for (let x = 0; x < WW; x++) {
+    const a = (2 * y) * CW + 2 * x;
+    tmp[y * WW + x] = (F.est[a] + F.est[a + 1] + F.est[a + CW] + F.est[a + CW + 1]) / 4;
+  }
+  for (let i = 0; i < NW; i++) if (tmp[i] > mx) mx = tmp[i];
+  for (let i = 0; i < NW; i++) out[i] = tmp[i] / mx + userW[i];
+  return out;
+}
+
+// ---------- rendering ----------
+const ctxOf = id => $(id).getContext('2d');
+const bufs = {};
+function buf(id) { return bufs[id] || (bufs[id] = ctxOf(id).createImageData(W, H)); }
+
+function drawFrame(id) { ctxOf(id).putImageData(new ImageData(new Uint8ClampedArray(rgba), W, H), 0, 0); }
+
+function drawRank1(id, m, w) {
+  const img = buf(id), d = img.data, k = S / 255;
+  for (let o = 0; o < rgba.length; o += 4) {
+    const z0 = rgba[o] * k - m[0], z1 = rgba[o + 1] * k - m[1], z2 = rgba[o + 2] * k - m[2];
+    const y = z0 * w[0] + z1 * w[1] + z2 * w[2];
+    d[o] = (m[0] + y * w[0]) / k; d[o + 1] = (m[1] + y * w[1]) / k; d[o + 2] = (m[2] + y * w[2]) / k; d[o + 3] = 255;
+  }
+  ctxOf(id).putImageData(img, 0, 0);
+}
+
+function drawDots(ctx, list, col) {
+  ctx.fillStyle = col;
+  const n = list.length;
+  list.forEach((i, j) => {
+    ctx.globalAlpha = 0.25 + 0.75 * j / n;
+    ctx.fillRect((i % CW) * CS + 1, ((i / CW) | 0) * CS + 1, 2.5, 2.5);
+  });
+  ctx.globalAlpha = 1;
+}
+
+function ramp(t) { t = Math.max(0, Math.min(1, t)); return [255 * Math.min(1, 1.8 * t), 255 * Math.max(0, 1.6 * t - 0.5), 255 * (0.45 * Math.sin(Math.PI * t) + 0.25 * t)]; }
+
+function drawHeatOverFrame(id, vals, cw, cs, col) {
+  const img = buf(id), d = img.data; let mx = 1e-12, mn = Infinity;
+  for (let i = 0; i < vals.length; i++) { if (vals[i] > mx) mx = vals[i]; if (vals[i] < mn) mn = vals[i]; }
+  const span = (mx - mn) || 1;
+  for (let py = 0; py < H; py++) for (let px = 0; px < W; px++) {
+    const o = (py * W + px) * 4, i = ((py / cs) | 0) * cw + ((px / cs) | 0);
+    const t = (vals[i] - mn) / span, gray = 0.25 * (rgba[o] + rgba[o + 1] + rgba[o + 2]) / 3;
+    const c = col ? [col[0] * t, col[1] * t, col[2] * t] : ramp(t);
+    d[o] = gray + 0.85 * c[0]; d[o + 1] = gray + 0.85 * c[1]; d[o + 2] = gray + 0.85 * c[2]; d[o + 3] = 255;
+  }
+  ctxOf(id).putImageData(img, 0, 0);
+}
+
+const hex = m => '#' + m.map(x => Math.max(0, Math.min(255, Math.round(255 * x / S))).toString(16).padStart(2, '0')).join('');
+const cdist = (a, b) => (255 / S) * Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
+const mean = a => a.length ? a.reduce((x, y) => x + y, 0) / a.length : NaN;
+
+function render() {
+  drawFrame('liveB');
+  const lb = ctxOf('liveB');
+  if ($('sal').value === 'lure') { lb.strokeStyle = '#ffffff88'; lb.beginPath(); lb.arc(lure.x * W, lure.y * H, 0.12 * W, 0, 7); lb.stroke(); }
+  drawDots(lb, dotsB, '#ffb347');
+  drawRank1('naiveCv', naive.m, naive.w);
+  drawRank1('wtCv', wtd.m, wtd.w);
+  drawRank1('truthCv', tr.m, tr.w);
+  $('naiveCap').innerHTML = `<span style="color:var(--naive)">naive Oja</span> <span class="sw" style="background:${hex(naive.m)}"></span> axis ${SS.angle(naive.w, tr.w).toFixed(1)}° · mean off by ${cdist(naive.m, tr.m).toFixed(0)}`;
+  $('wtCap').innerHTML = `<span style="color:var(--wt)">weighted Oja</span> <span class="sw" style="background:${hex(wtd.m)}"></span> axis ${SS.angle(wtd.w, tr.w).toFixed(1)}° · mean off by ${cdist(wtd.m, tr.m).toFixed(0)}`;
+  $('truthCap').innerHTML = `truth (whole frame) <span class="sw" style="background:${hex(tr.m)}"></span> axis [${tr.w.map(x => x.toFixed(2)).join(', ')}]`;
+
+  const qs = [[U, 'cU', 'capU', 'uniform', '--uni', [88, 214, 141]], [R, 'cR', 'capR', 'repo trace', '--repo', [255, 209, 102]], [F, 'cF', 'capF', 'estimate trace', '--fix', [90, 176, 255]]];
+  for (const [Z, id, cid, name, cv, col] of qs) {
+    drawHeatOverFrame(id, Z.q, CW, CS, col);
+    drawDots(ctxOf(id), Z.dots, '#ffffff');
+    let top = 0; const sorted = Array.from(Z.q).sort((a, b) => b - a); for (let i = 0; i < N / 20; i++) top += sorted[i];
+    $(cid).innerHTML = `<span style="color:var(${cv})">${name}</span> · axis error now ${Z.hist[Z.hist.length - 1].toFixed(1)}° · mean of last 300 ${mean(Z.hist.slice(-300)).toFixed(2)}° · top 5% of cells get ${(100 * top).toFixed(0)}% of looks`;
+  }
+  drawChart();
+  const n = Math.min(F.hist.length, U.hist.length, 300);
+  let fw = 0, rw = 0; for (let j = 1; j <= n; j++) { if (F.hist[F.hist.length - j] < U.hist[U.hist.length - j]) fw++; if (R.hist[R.hist.length - j] < U.hist[U.hist.length - j]) rw++; }
+  $('raceCap').innerHTML = n ? `Over the last ${n} frames, the estimate trace is ahead of uniform in <b>${(100 * fw / n).toFixed(0)}%</b> of frames and the repo trace in <b>${(100 * rw / n).toFixed(0)}%</b>. Fewer looks per frame make the gap easier to see.` : '';
+
+  drawWorld();
+  $('lam').textContent = lam.toFixed(5);
+}
+
+function drawChart() {
+  const cv = $('chart'), c = cv.getContext('2d'), w = cv.width, h = cv.height;
+  c.clearRect(0, 0, w, h);
+  c.strokeStyle = '#1e2831'; c.fillStyle = '#6b7784'; c.font = '20px monospace';
+  for (const deg of [0, 5, 10, 20, 40]) {
+    const y = h - 8 - (h - 16) * Math.sqrt(deg / 45); c.beginPath(); c.moveTo(40, y); c.lineTo(w, y); c.stroke(); c.fillText(deg + '°', 2, y + 6);
+  }
+  for (const [Z, col] of [[U, '#58d68d'], [R, '#ffd166'], [F, '#5ab0ff']]) {
+    c.strokeStyle = col; c.lineWidth = 2; c.beginPath();
+    Z.hist.forEach((a, j) => { const x = 40 + (w - 40) * j / 600, y = h - 8 - (h - 16) * Math.sqrt(Math.min(a, 45) / 45); j ? c.lineTo(x, y) : c.moveTo(x, y); });
+    c.stroke();
+  }
+}
+
+const wctx = $('worldCv').getContext('2d');
+const small = document.createElement('canvas'); small.width = WW; small.height = WH;
+const sctx = small.getContext('2d'), simg = sctx.createImageData(WW, WH);
+function drawWorld() {
+  const view = $('view').value, arr = view === 'e' ? el : view === 'v' ? v : view === 'u' ? u : s;
+  let mx = 1e-12, mn = Infinity; for (let i = 0; i < NW; i++) { if (arr[i] > mx) mx = arr[i]; if (arr[i] < mn) mn = arr[i]; }
+  for (let i = 0; i < NW; i++) { const c = ramp((arr[i] - mn) / ((mx - mn) || 1)); simg.data.set([c[0], c[1], c[2], 255], 4 * i); }
+  sctx.putImageData(simg, 0, 0);
+  wctx.globalAlpha = 1; wctx.drawImage(cap, 0, 0, 320, 240);
+  wctx.globalAlpha = 0.78; wctx.imageSmoothingEnabled = true; wctx.drawImage(small, 0, 0, 320, 240); wctx.globalAlpha = 1;
+}
+
+// ---------- interaction ----------
+$('liveB').addEventListener('click', ev => {
+  const r = ev.target.getBoundingClientRect();
+  lure = { x: (ev.clientX - r.left) / r.width, y: (ev.clientY - r.top) / r.height };
+  $('sal').value = 'lure';
+});
+
+$('worldCv').addEventListener('click', ev => {
+  const r = ev.target.getBoundingClientRect();
+  const x = Math.min(WW - 1, ((ev.clientX - r.left) / r.width * WW) | 0), y = Math.min(WH - 1, ((ev.clientY - r.top) / r.height * WH) | 0);
+  const j = y * WW + x, amp = P.wamp, a = P.alpha;
+  // prediction from current elasticity, then an honest recomputation on a frozen copy of the world
+  const s0 = worldTrace(new Float64Array(NW)), f0 = s0.map(q => Math.exp(a * q)), f1 = f0.slice();
+  f1[j] = Math.exp(a * (s0[j] + amp));
+  const v0 = v.slice(), v1 = v.slice(), t = new Float64Array(NW);
+  const l0 = SS.perron(f0, WW, WH, v0, 2500, t, KD), l1 = SS.perron(f1, WW, WH, v1, 2500, t, KD);
+  const e0 = SS.elasticity(f0, v0, new Float64Array(NW), new Float64Array(NW));
+  const pred = a * e0[j] * amp, meas = Math.log(l1 / l0);
+  let rank = 0; for (let i = 0; i < NW; i++) if (e0[i] > e0[j]) rank++;
+  $('clickCap').innerHTML = `Write ${amp.toFixed(2)} at cell (${x},${y}), elasticity rank ${rank + 1} of ${NW}.<br>predicted Δlog λ = <b>${pred.toExponential(3)}</b> · recomputed = <b>${meas.toExponential(3)}</b> · ratio ${(meas / pred).toFixed(3)}`;
+  userW[j] += amp;
+});
+
+// ---------- loop ----------
+function loop() {
+  if (grab()) { step(); render(); frameNo++; }
+  requestAnimationFrame(loop);
+}
+$('status').textContent = 'Press "Start camera" or "Synthetic scene".';
+requestAnimationFrame(loop);
+})();
 </script>
 </body>
 </html>
