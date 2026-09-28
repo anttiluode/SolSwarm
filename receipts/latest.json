@@ -1,49 +1,49 @@
 {
   "gate_A_world_written_operator": {
     "hub": {
-      "future_B_mass": 0.6558361283545424,
-      "growth_ratio_B_over_A": 1.072280212692396
+      "future_B_mass": 0.6558361284,
+      "growth_ratio_B_over_A": 1.0722802127
     },
     "initial_B_mass": 0.5,
     "leaf": {
-      "future_B_mass": 0.4346348309913773,
-      "growth_ratio_B_over_A": 0.9748970472171341
+      "future_B_mass": 0.434634831,
+      "growth_ratio_B_over_A": 0.9748970472
     },
     "same_initial_state": true,
     "same_total_write": true,
     "spectral_susceptibility": [
-      -0.9473687621469606,
-      -0.2631584205131654,
-      -0.2631584205131654,
-      -0.2631584207490878,
-      -0.2631584208739879,
-      0.9473687620775717,
-      0.263158420277243,
-      0.2631584206380655,
-      0.2631584206380655,
-      0.2631584206380655
+      -0.9473687621,
+      -0.2631584205,
+      -0.2631584205,
+      -0.2631584207,
+      -0.2631584209,
+      0.9473687621,
+      0.2631584203,
+      0.2631584206,
+      0.2631584206,
+      0.2631584206
     ],
     "steps": 20,
     "write": 0.15
   },
   "gate_B_importance_weighted_oja": {
-    "naive_median_angle_deg": 74.36605399168829,
-    "proposal_mass_on_high_error_sites": 0.8322122475793838,
+    "naive_median_angle_deg": 74.3660539917,
+    "proposal_mass_on_high_error_sites": 0.8322122476,
     "seeds": 32,
     "steps": 3000,
     "target_direction": [
-      0.9813848819169214,
-      0.1920513304950275
+      0.9813848819,
+      0.1920513305
     ],
-    "weighted_max_angle_deg": 5.9696052874815,
-    "weighted_median_angle_deg": 2.2464304892914253
+    "weighted_max_angle_deg": 5.9696052875,
+    "weighted_median_angle_deg": 2.2464304893
   },
   "gate_C_adaptive_boundary": {
-    "adaptive_naive_median_angle_deg": 17.437442899067936,
-    "adaptive_weighted_median_angle_deg": 7.491798784578243,
+    "adaptive_naive_median_angle_deg": 17.4374428991,
+    "adaptive_weighted_median_angle_deg": 7.4917987846,
     "seeds": 64,
     "steps": 200,
-    "uniform_median_angle_deg": 3.252603158083483,
+    "uniform_median_angle_deg": 3.2526031581,
     "weighted_adaptive_beats_uniform_median": false,
     "weighted_adaptive_seed_win_fraction": 0.296875
   }
