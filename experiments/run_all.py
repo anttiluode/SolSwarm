@@ -18,7 +18,7 @@ def build_receipt() -> dict:
         "gate_A_world_written_operator": operator,
         "gate_B_importance_weighted_oja": oja_receipt(seeds=32, steps=3000),
         "gate_C_adaptive_boundary": adaptive_receipt(seeds=64, steps=200),
-    }, digits=10)
+    })
 
 
 def main() -> None:
