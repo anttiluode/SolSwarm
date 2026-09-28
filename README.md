@@ -15,11 +15,11 @@ The point is not to claim a new swarm optimizer. The point is to separate what a
 
 A ten-state toy world has two route families, A and B. Persistent trace `s` modifies a positive operator
 
-\[
+$$
 L(s)=M\,\mathrm{diag}(\exp(b+\alpha s)),
 \qquad
 q_{t+1}=\frac{L(s)q_t}{\mathbf 1^\top L(s)q_t}.
-\]
+$$
 
 Two counterfactual worlds start from the **same population** and receive the **same total trace** in B. The only difference is the address of that write.
 
@@ -48,9 +48,9 @@ Naive Oja therefore learns the **proposal's** mode, not the world's mode.
 
 Importance-weighted Oja uses
 
-\[
+$$
 w_i=\frac{p_i}{q_i}
-\]
+$$
 
 inside the update. Across 32 deterministic seeds and 3,000 observations:
 
@@ -87,7 +87,7 @@ This is the same warning raised by the BiomorphicSwarm experiments: "look where 
 
 SolSwarm's positive branch is the operator picture:
 
-\[
+$$
 \text{local history}
 \rightarrow
 s
@@ -97,17 +97,17 @@ L(s)
 \text{spectral ordering}
 \rightarrow
 \text{later macroscopic population}.
-\]
+$$
 
 Its sampling branch is:
 
-\[
+$$
 x_t\sim q_t
 \rightarrow
 \frac{p(x_t)}{q_t(x_t)}\,\text{evidence}
 \rightarrow
 \text{Oja mode estimate}.
-\]
+$$
 
 Together they give a concrete question for larger systems:
 
