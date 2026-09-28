@@ -1,49 +1,49 @@
 {
   "gate_A_world_written_operator": {
     "hub": {
-      "future_B_mass": 0.6558361284,
-      "growth_ratio_B_over_A": 1.0722802127
+      "future_B_mass": 0.65583613,
+      "growth_ratio_B_over_A": 1.07228021
     },
     "initial_B_mass": 0.5,
     "leaf": {
-      "future_B_mass": 0.434634831,
-      "growth_ratio_B_over_A": 0.9748970472
+      "future_B_mass": 0.43463483,
+      "growth_ratio_B_over_A": 0.97489705
     },
     "same_initial_state": true,
     "same_total_write": true,
     "spectral_susceptibility": [
-      -0.9473687621,
-      -0.2631584205,
-      -0.2631584205,
-      -0.2631584207,
-      -0.2631584209,
-      0.9473687621,
-      0.2631584203,
-      0.2631584206,
-      0.2631584206,
-      0.2631584206
+      -0.94736876,
+      -0.26315842,
+      -0.26315842,
+      -0.26315842,
+      -0.26315842,
+      0.94736876,
+      0.26315842,
+      0.26315842,
+      0.26315842,
+      0.26315842
     ],
     "steps": 20,
     "write": 0.15
   },
   "gate_B_importance_weighted_oja": {
-    "naive_median_angle_deg": 74.3660539917,
-    "proposal_mass_on_high_error_sites": 0.8322122476,
+    "naive_median_angle_deg": 74.36605399,
+    "proposal_mass_on_high_error_sites": 0.83221225,
     "seeds": 32,
     "steps": 3000,
     "target_direction": [
-      0.9813848819,
-      0.1920513305
+      0.98138488,
+      0.19205133
     ],
-    "weighted_max_angle_deg": 5.9696052875,
-    "weighted_median_angle_deg": 2.2464304893
+    "weighted_max_angle_deg": 5.96960529,
+    "weighted_median_angle_deg": 2.24643049
   },
   "gate_C_adaptive_boundary": {
-    "adaptive_naive_median_angle_deg": 17.4374428991,
-    "adaptive_weighted_median_angle_deg": 7.4917987846,
+    "adaptive_naive_median_angle_deg": 17.4374429,
+    "adaptive_weighted_median_angle_deg": 7.49179878,
     "seeds": 64,
     "steps": 200,
-    "uniform_median_angle_deg": 3.2526031581,
+    "uniform_median_angle_deg": 3.25260316,
     "weighted_adaptive_beats_uniform_median": false,
     "weighted_adaptive_seed_win_fraction": 0.296875
   }
