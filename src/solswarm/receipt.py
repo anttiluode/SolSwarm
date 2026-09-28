@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 
-def canonicalize(value, digits: int = 10):
+def canonicalize(value, digits: int = 8):
     """Round report-only floats recursively while preserving booleans and integers."""
     if isinstance(value, bool) or isinstance(value, int):
         return value
