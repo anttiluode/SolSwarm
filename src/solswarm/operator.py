@@ -39,6 +39,32 @@ def _spectral_radius(block: np.ndarray) -> float:
     return float(np.max(np.abs(np.linalg.eigvals(block))))
 
 
+def _perron_elasticity(block: np.ndarray, alpha: float) -> np.ndarray:
+    """Return d log(rho) / d trace_j for one positive block.
+
+    For L(s)=M diag(exp(alpha*s)), Perron perturbation theory reduces the
+    trace sensitivity exactly to alpha * u_j * v_j / (u^T v), where u and v
+    are the left and right Perron eigenvectors of the block.
+    """
+    values, right_vectors = np.linalg.eig(block)
+    index = int(np.argmax(np.abs(values)))
+    rho = float(np.real(values[index]))
+    right = np.real(right_vectors[:, index])
+
+    left_values, left_vectors = np.linalg.eig(block.T)
+    left_index = int(np.argmin(np.abs(left_values - rho)))
+    left = np.real(left_vectors[:, left_index])
+
+    # Perron vectors are strictly one-signed for these irreducible blocks;
+    # abs removes the arbitrary eigenvector sign chosen by the eigensolver.
+    right = np.abs(right)
+    left = np.abs(left)
+    overlap = float(left @ right)
+    if overlap <= 0 or not np.isfinite(overlap):
+        raise FloatingPointError("invalid Perron left/right overlap")
+    return alpha * left * right / overlap
+
+
 def module_growth_ratio(L: np.ndarray) -> float:
     """Return rho(B block) / rho(A block)."""
     L = np.asarray(L, dtype=float)
@@ -66,6 +92,20 @@ def evolve(q0: np.ndarray, L: np.ndarray, steps: int) -> np.ndarray:
         q /= total
         hist.append(q.copy())
     return np.asarray(hist)
+
+
+def analytic_spectral_susceptibility(
+    trace: np.ndarray, alpha: float = 2.0, a_bias: float = 0.08
+) -> np.ndarray:
+    """Exact Perron d log(rho_B/rho_A) / d trace_i for the two modules."""
+    trace = np.asarray(trace, dtype=float)
+    if trace.shape != (10,):
+        raise ValueError("trace must have shape (10,)")
+    L = positive_operator(trace, alpha=alpha, a_bias=a_bias)
+    out = np.empty(10, dtype=float)
+    out[:5] = -_perron_elasticity(L[:5, :5], alpha=alpha)
+    out[5:] = _perron_elasticity(L[5:, 5:], alpha=alpha)
+    return out
 
 
 def spectral_susceptibility(trace: np.ndarray, eps: float = 1e-6) -> np.ndarray:
