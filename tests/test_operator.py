@@ -1,6 +1,7 @@
 import numpy as np
 
 from solswarm.operator import (
+    analytic_spectral_susceptibility,
     build_transition,
     matched_write_receipt,
     spectral_susceptibility,
@@ -28,3 +29,12 @@ def test_hub_has_greater_spectral_susceptibility_than_leaves():
     b = sens[5:]
     assert b[0] > max(b[1:])
     assert b[0] > 1.5 * np.mean(b[1:])
+
+
+def test_analytic_perron_elasticity_matches_finite_difference_susceptibility():
+    trace = np.zeros(10)
+    analytic = analytic_spectral_susceptibility(trace, alpha=2.0)
+    finite = spectral_susceptibility(trace, eps=1e-6)
+    assert np.allclose(analytic, finite, atol=2e-6, rtol=0.0)
+    assert np.isclose(-analytic[:5].sum(), 2.0, atol=1e-10)
+    assert np.isclose(analytic[5:].sum(), 2.0, atol=1e-10)
