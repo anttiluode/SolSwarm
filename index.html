@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SolSwarm — world-written operators</title>
+<style>
+:root{--bg:#0b0d10;--panel:#11161c;--ink:#e8edf2;--muted:#8793a0;--line:#27303a;--a:#5ab0ff;--b:#ff665e;--good:#58d68d;--warn:#ffd166}
+*{box-sizing:border-box} body{margin:0;background:radial-gradient(circle at 20% 0,#13202a 0,#0b0d10 38%);color:var(--ink);font:15px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace}
+main{max-width:1180px;margin:auto;padding:42px 22px 80px} h1{font-size:clamp(34px,6vw,72px);line-height:.95;margin:0 0 14px;letter-spacing:-.06em} h2{margin:0 0 8px;font-size:22px}
+.kicker{color:var(--good);letter-spacing:.12em;text-transform:uppercase;font-size:12px}.lede{max-width:850px;color:#bcc7d1;font-size:18px}.eq{padding:12px 16px;border:1px solid var(--line);background:#0e1217;border-radius:8px;color:#d7e0e8;overflow:auto}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px;margin-top:26px}.card{grid-column:span 6;background:linear-gradient(180deg,#12181f,#0f1419);border:1px solid var(--line);border-radius:14px;padding:20px;box-shadow:0 18px 60px #0005}.wide{grid-column:1/-1}
+.metricrow{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}.metric{background:#0b1014;border:1px solid #222c35;border-radius:10px;padding:12px}.metric b{display:block;font-size:21px}.muted{color:var(--muted)}.good{color:var(--good)}.warn{color:var(--warn)}
+button,input{font:inherit} button{background:#17212a;color:var(--ink);border:1px solid #33414d;border-radius:7px;padding:8px 12px;cursor:pointer}button.active{border-color:var(--good);color:var(--good)}
+.controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:12px 0} canvas{width:100%;height:280px;background:#0a0e12;border:1px solid #202a33;border-radius:10px}
+.bar{height:10px;background:#1b242c;border-radius:999px;overflow:hidden;margin-top:5px}.bar i{display:block;height:100%}
+.small{font-size:12px}.claim{border-left:3px solid var(--good);padding-left:14px;margin:18px 0}
+@media(max-width:800px){.card{grid-column:1/-1}.metricrow{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main>
+<div class="kicker">SolSwarm / v0 falsifier</div>
+<h1>The world writes<br>the next operator.</h1>
+<p class="lede">A small experiment about stigmergy, positive operators, biased scouts, importance correction, and Oja. The page visualizes the geometry; the committed Python receipt is authoritative.</p>
+<div class="eq">q(t+1) = L(s) q(t) / 1ᵀL(s)q(t) &nbsp;&nbsp; · &nbsp;&nbsp; importance weight = p(x) / q(x)</div>
+
+<section class="grid">
+<article class="card">
+  <div class="kicker">Gate A</div><h2>Matched write, different address</h2>
+  <p class="muted">Same current population. Same amount of persistent trace. Only the address changes.</p>
+  <div class="controls">
+    <button id="hubBtn" class="active">write B hub</button><button id="leafBtn">write B leaf</button>
+    <label>write <input id="write" type="range" min="0" max=".3" value=".15" step=".005"></label>
+    <span id="writeVal">0.150</span>
+  </div>
+  <canvas id="modeCanvas" width="700" height="280"></canvas>
+  <div class="metricrow">
+    <div class="metric"><span class="muted">B/A spectral ratio</span><b id="ratio">1.072</b></div>
+    <div class="metric"><span class="muted">B mass now</span><b>0.500</b></div>
+    <div class="metric"><span class="muted">B mass at t=20</span><b id="future">0.656</b></div>
+  </div>
+  <p class="claim">The spectral ordering changes before the visible population has had time to separate.</p>
+</article>
+
+<article class="card">
+  <div class="kicker">Gate B</div><h2>Importance-weighted Oja</h2>
+  <p class="muted">The scouts spend 83.2% of their looks on two misleading high-error sites. Naive Oja learns the visitation distribution. Reweighting learns the intended world distribution.</p>
+  <canvas id="ojaCanvas" width="700" height="280"></canvas>
+  <div class="metricrow">
+    <div class="metric"><span class="muted">naive angle</span><b class="warn">74.37°</b></div>
+    <div class="metric"><span class="muted">weighted angle</span><b class="good">2.25°</b></div>
+    <div class="metric"><span class="muted">high-error visit mass</span><b>83.2%</b></div>
+  </div>
+</article>
+
+<article class="card wide">
+  <div class="kicker">Gate C / negative boundary</div><h2>Bias correction is not a free optimizer</h2>
+  <p>The closed-loop scouts leave trace where the raw Oja update is large, and that trace attracts later looks. Importance correction makes this adaptive stream much less biased, but at equal budget it still loses to uniform sampling.</p>
+  <div class="metricrow">
+    <div class="metric"><span class="muted">uniform</span><b class="good">3.25°</b><div class="bar"><i style="width:18%;background:var(--good)"></i></div></div>
+    <div class="metric"><span class="muted">adaptive + corrected</span><b>7.49°</b><div class="bar"><i style="width:42%;background:var(--a)"></i></div></div>
+    <div class="metric"><span class="muted">adaptive naive</span><b class="warn">17.44°</b><div class="bar"><i style="width:96%;background:var(--warn)"></i></div></div>
+  </div>
+  <p class="claim">What survives: nonuniform looking can be statistically corrected. What does not survive: “follow useful-looking updates” automatically beats randomness.</p>
+</article>
+</section>
+
+<p class="muted small">Frozen receipt: 32 seeds × 3,000 observations for Gate B; 64 seeds × 200 observations for Gate C. See README and receipts/latest.json.</p>
+</main>
+<script>
+const hubBtn=document.getElementById('hubBtn'),leafBtn=document.getElementById('leafBtn'),slider=document.getElementById('write');
+let site='hub';
+function transition(){
+  const M=Array.from({length:10},()=>Array(10).fill(0));
+  [[0,5],[5,0]].forEach(([base,other])=>{
+    M[base][base]=.36; for(let l=base+1;l<base+5;l++) M[l][base]=.15; M[other][base]=.04;
+    for(let l=base+1;l<base+5;l++){M[base][l]=.54;M[l][l]=.42;M[other][l]=.04}
+  }); return M;
+}
+const M=transition();
+function matVec(A,x){return A.map(r=>r.reduce((s,v,j)=>s+v*x[j],0))}
+function rho5(block){
+  let v=Array(5).fill(.2);
+  for(let k=0;k<80;k++){let y=block.map(r=>r.reduce((s,a,j)=>s+a*v[j],0));let n=y.reduce((a,b)=>a+b,0);v=y.map(x=>x/n)}
+  let y=block.map(r=>r.reduce((s,a,j)=>s+a*v[j],0)); return y.reduce((a,b)=>a+b,0);
+}
+function makeL(write,site){
+  const trace=Array(10).fill(0); trace[site==='hub'?5:6]=write;
+  const fit=trace.map((s,i)=>Math.exp((i<5?.08:0)+2*s));
+  return M.map(r=>r.map((v,j)=>v*fit[j]));
+}
+function sub(A,a){return A.slice(a,a+5).map(r=>r.slice(a,a+5))}
+function evolve(L){
+  let q=Array(10).fill(.1),hist=[.5];
+  for(let t=0;t<20;t++){q=matVec(L,q);let z=q.reduce((a,b)=>a+b,0);q=q.map(x=>x/z);hist.push(q.slice(5).reduce((a,b)=>a+b,0))}
+  return hist;
+}
+function drawMode(){
+  const w=+slider.value, L=makeL(w,site), ratio=rho5(sub(L,5))/rho5(sub(L,0)), hist=evolve(L);
+  document.getElementById('writeVal').textContent=w.toFixed(3);document.getElementById('ratio').textContent=ratio.toFixed(3);document.getElementById('future').textContent=hist.at(-1).toFixed(3);
+  const c=document.getElementById('modeCanvas'),x=c.getContext('2d'),W=c.width,H=c.height;x.clearRect(0,0,W,H);
+  x.strokeStyle='#27303a';x.lineWidth=1;for(let k=0;k<=4;k++){let y=30+k*(H-60)/4;x.beginPath();x.moveTo(45,y);x.lineTo(W-20,y);x.stroke()}
+  x.strokeStyle=site==='hub'?'#58d68d':'#5ab0ff';x.lineWidth=3;x.beginPath();hist.forEach((v,i)=>{let px=45+i*(W-70)/20,py=H-30-(v-.35)/.35*(H-60);i?x.lineTo(px,py):x.moveTo(px,py)});x.stroke();
+  x.fillStyle='#8793a0';x.font='13px monospace';x.fillText('visible B population mass',45,18);x.fillText('t=0',45,H-8);x.fillText('t=20',W-58,H-8);
+  x.fillStyle=ratio>1?'#58d68d':'#ffd166';x.fillText(ratio>1?'spectral mode: B grows':'spectral mode: A grows',W-230,20);
+}
+hubBtn.onclick=()=>{site='hub';hubBtn.classList.add('active');leafBtn.classList.remove('active');drawMode()};leafBtn.onclick=()=>{site='leaf';leafBtn.classList.add('active');hubBtn.classList.remove('active');drawMode()};slider.oninput=drawMode;
+
+function drawOja(){
+  const c=document.getElementById('ojaCanvas'),x=c.getContext('2d'),W=c.width,H=c.height;x.clearRect(0,0,W,H);const cx=W/2,cy=H/2,s=48;
+  x.strokeStyle='#27303a';x.beginPath();x.moveTo(20,cy);x.lineTo(W-20,cy);x.moveTo(cx,20);x.lineTo(cx,H-20);x.stroke();
+  const pts=[[2.2,.2],[-2.1,-.1],[1.8,-.3],[-1.9,.25],[2,.4],[-2.2,-.35],[.2,2.6],[-.15,-2.7]];
+  const probs=[.03,.03,.03,.03,.03,.03,.42,.42];pts.forEach((p,i)=>{x.beginPath();x.arc(cx+p[0]*s,cy-p[1]*s,5+probs[i]*20,0,Math.PI*2);x.fillStyle=i>=6?'#ff665e99':'#5ab0ff99';x.fill()});
+  function vec(angle,len,color,label){x.strokeStyle=color;x.lineWidth=4;x.beginPath();x.moveTo(cx,cy);x.lineTo(cx+Math.cos(angle)*len,cy-Math.sin(angle)*len);x.stroke();x.fillStyle=color;x.font='13px monospace';x.fillText(label,cx+Math.cos(angle)*len*.72+5,cy-Math.sin(angle)*len*.72)}
+  const target=Math.atan2(.192051,.981385);vec(target,125,'#58d68d','target world PC');vec(target+74.366*Math.PI/180,105,'#ffd166','naive');vec(target+2.246*Math.PI/180,115,'#5ab0ff','weighted');
+}
+drawMode();drawOja();
+</script>
+</body>
+</html>
