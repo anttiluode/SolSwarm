@@ -1,0 +1,1 @@
+"""SolSwarm scientific toy package."""
