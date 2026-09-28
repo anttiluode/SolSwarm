@@ -2,7 +2,7 @@
 
 Demo by Claude: 
 
-[Check it out!](index.html)
+[Check it out!](https://anttiluode.github.io/SolSwarm/)
 
 ![pic](pic.png)
 
