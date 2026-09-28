@@ -7,13 +7,22 @@ import numpy as np
 
 from solswarm.adaptive import adaptive_receipt
 from solswarm.oja import oja_receipt
-from solswarm.operator import matched_write_receipt, spectral_susceptibility
+from solswarm.operator import (
+    analytic_spectral_susceptibility,
+    matched_write_receipt,
+    spectral_susceptibility,
+)
 from solswarm.receipt import canonicalize
 
 
 def build_receipt() -> dict:
     operator = matched_write_receipt(write=0.15, steps=20)
-    operator["spectral_susceptibility"] = spectral_susceptibility(np.zeros(10)).tolist()
+    trace = np.zeros(10)
+    finite = spectral_susceptibility(trace)
+    analytic = analytic_spectral_susceptibility(trace)
+    operator["spectral_susceptibility"] = finite.tolist()
+    operator["analytic_spectral_susceptibility"] = analytic.tolist()
+    operator["max_abs_analytic_fd_error"] = float(np.max(np.abs(analytic - finite)))
     return canonicalize({
         "gate_A_world_written_operator": operator,
         "gate_B_importance_weighted_oja": oja_receipt(seeds=32, steps=3000),
