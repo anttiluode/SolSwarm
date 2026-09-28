@@ -4,6 +4,8 @@ Demo by Claude:
 
 [Check it out!](index.html)
 
+![pic](pic.png)
+
 **Can a world remember what happened strongly enough that a linear operator reveals what the population is becoming before the population visibly gets there?**
 
 SolSwarm is a deliberately small falsifier built from four familiar ingredients:
